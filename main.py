@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import glob
@@ -113,20 +114,22 @@ def process_frame(frame, camera_matrix, dist_coeffs, src, dst):
 def main():
     #***************************Compute the camera calibration matrix and distortion coefficients given a set of chessboard images************************
 
+    os.makedirs('output_images', exist_ok=True)  # folder za izlazne slike
+
     chessboard_corners = (9, 6)  # Broj unutrasnjih uglova sahovske table(S obzirom da imamo kvadrata 10x7, uglova imamo 10x6)
 
     # Najpre napravimo trodimenzijalnu matricu 54 elementa ispunjenu nulama, a zatim zamenimo to sa koordinatama uglova, Z osa ostaje na 0
     matrix = np.zeros((chessboard_corners[0] * chessboard_corners[1], 3), np.float32)
     matrix[:, :2] = np.mgrid[0:chessboard_corners[0], 0:chessboard_corners[1]].T.reshape(-1, 2)
 
-    matrix_points = []  # 3D tačke sahovske table 
+    matrix_points = []  # 3D tacke sahovske table 
     image_points = []  # koordinate uglova detektovanih na slikama
 
     images = glob.glob('camera_cal/*.jpg')  # Putanja do foldera sa slikama, uzimamo sve slike iz foldera
 
     for image in images:
         img = cv2.imread(image)  # Učitavanje slike
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Konvertujemo sliku u sivu, kako bi se detektovale ivice na slici spram svetline
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Konvertujemo sliku u sivu, kako bi se detektovale ivice na slici naspram svetline
 
         # Pronalazimo sve uglove na slici, ukoliko uspesno pronadje 54 ugla sahovske table, ret ce biti TRUE, a u corners smestamo koordinate uglova na slici
         ret, corners = cv2.findChessboardCorners(gray, chessboard_corners, None) #ako zelimo poseban nacin detektovanja, to mozemo zameniti umesto None
@@ -144,12 +147,18 @@ def main():
     print("\n/*************** Distortion Coefficients *****************/")
     print(dist_coeffs)
 
+    # Snimamo primer sahovske table pre i posle uklanjanja distorzije
+    chess_img = cv2.imread('camera_cal/calibration1.jpg')
+    chess_undist = cv2.undistort(chess_img, camera_matrix, dist_coeffs, None, camera_matrix)
+    cv2.imwrite('output_images/0_undistort_chessboard.jpg', np.hstack((chess_img, chess_undist)))
+
 
     #*************************** Apply a distortion correction to raw images ************************************
 
     # Sada mozemo da ispravimo iskrivljene slike
     img = cv2.imread('test_images/whiteCarLaneSwitch.jpg') 
     undistorted_img = cv2.undistort(img, camera_matrix, dist_coeffs, None, camera_matrix)
+    cv2.imwrite('output_images/1_undistorted.jpg', undistorted_img)
     # cv2.imshow('Distorted image: ', img)
     # cv2.imshow('Undistorted image: ', undistorted_img)
     # cv2.waitKey(0) #slike ce ostati prikazane sve dok ih rucno ne uklonimo
@@ -175,6 +184,7 @@ def main():
     combined_binary = np.zeros_like(binary_b)
     combined_binary[(binary_b == 1) | (canny_edges > 0)] = 1  
     binary_img = combined_binary * 255
+    cv2.imwrite('output_images/2_combined_binary.jpg', binary_img)
     # Prikaz rezultata
     cv2.imshow('Combined Binary', combined_binary * 255) #mnozimo sa 255 jer ce crni deo (0) i dalje ostati 0, a sivi deo(1) ce postati 255 odnosno beo za imshow
     cv2.waitKey(0)
@@ -183,7 +193,7 @@ def main():
 
     #*************************** Apply a perspective transform to rectify binary image ("birds-eye view") ************************************
 
-    line_dst_offset = 150  # Veći offset - sira perspektiva
+    line_dst_offset = 150  # Veci offset - sira perspektiva
     src = [  #koordinate 4 tacke sa ulazne slike 
         [440, 340],  #gornje tacke
         [530, 340],  #gornje tacke
@@ -191,7 +201,7 @@ def main():
         [190, 530]   #donje tacke
     ]
 
-    dst = [  # tacke na novoj slici, pomeramo ih tako da prethodno odabrani pravougaonik sada pretstavlja citavu sliku
+    dst = [  # tacke na novoj slici, pomeramo ih tako da prethodno odabrani pravougaonik sada predstavlja citavu sliku
         [src[3][0] + line_dst_offset, 0],                
         [src[2][0] - line_dst_offset, 0],                  
         [src[2][0] - line_dst_offset, binary_img.shape[0]], 
@@ -199,6 +209,7 @@ def main():
     ]
 
     img_pt = PerspectiveTransform(binary_img, src, dst)
+    cv2.imwrite('output_images/3_perspective_transform.jpg', img_pt)
     cv2.imshow('PerspectiveTransform image', img_pt)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -268,7 +279,7 @@ def main():
     left_fitx = left_fit[0] * ploty**2 + left_fit[1] * ploty + left_fit[2]
     right_fitx = right_fit[0] * ploty**2 + right_fit[1] * ploty + right_fit[2]
 
-    # Iscrtavanje pronađenih piksela i polinoma
+    # Iscrtavanje pronadjenih piksela i polinoma
     output_img[nonzero_y[left_lane_inds], nonzero_x[left_lane_inds]] = [255, 0, 0]
     output_img[nonzero_y[right_lane_inds], nonzero_x[right_lane_inds]] = [0, 0, 255]
 
@@ -281,6 +292,7 @@ def main():
     # Prikaz slike sa rezultatima
     plt.imshow(output_img)
     plt.title("Lane Detection and Fitted Polynomials")
+    plt.savefig('output_images/4_lane_detection.png')  # mora pre plt.show()
     plt.show()
 
     
@@ -324,6 +336,8 @@ def main():
     # Ispisivanje zakrivljenosti i pozicije vozila na rezultujućoj slici
     cv2.putText(result, f"Radius: {avg_curverad:.2f}m", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1) #gornji levi ugao, belom bojom, velicina fonta 0.5 i debljine 1
     cv2.putText(result, f"Vehicle offset: {center_offset:.2f}m", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+    cv2.imwrite('output_images/5_result.jpg', result)
 
     # Prikaz koncane slike
     cv2.imshow('Result', result)
