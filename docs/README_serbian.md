@@ -53,7 +53,7 @@ Zatim se za svaku sliku iz `camera_cal/`:
 Kada su prikupljene tacke sa svih slika, poziva se `cv2.calibrateCamera(matrix_points, image_points, ...)`, koja vraca matricu kamere (`camera_matrix`) i koeficijente distorzije (`dist_coeffs`). 
 Da bi se proverila kalibracija, na sliku `camera_cal/calibration1.jpg` primenjena je funkcija `cv2.undistort` sa dobijenim parametrima. Levo je originalna slika, a desno slika sa uklonjenom distorzijom. Na originalnoj slici linije table su savijene ka ivicama, a na ispravljenoj su prave:
 
-![Calibration Original and Undistorted](./output_images/0_undistort_chessboard.jpg)
+![Calibration Original and Undistorted](../output_images/0_undistort_chessboard.jpg)
 
 
 ### Pipeline (single images)
@@ -67,11 +67,11 @@ Kada sam dobila matricu kamere (`camera_matrix`) i koeficijente distorzije (`dis
 Razlika izmedju originalne i ispravljene slike puta nije toliko uocljiva kao kod sahovske table, ali se najvise primecuje na ivicama slike, gde je distorzija najveca.
 Originalna slika puta:
 
-![Original Road Image](./test_images/whiteCarLaneSwitch.jpg)
+![Original Road Image](../test_images/whiteCarLaneSwitch.jpg)
 
 Primer slike puta nakon uklanjanja distorzije:
 
-![Undistorted Road Image](./output_images/1_undistorted.jpg)
+![Undistorted Road Image](../output_images/1_undistorted.jpg)
 
 
 
@@ -95,7 +95,7 @@ Na kraju sam spojila oba rezultata: piksel u slici `combined_binary` ima vrednos
 
 Primer binarne slike (zuta linija levo je dobijena iz B kanala, a bele isprekidane linije desno pomocu Canny algoritma):
 
-![Combined Binary Image](./output_images/2_combined_binary.jpg)
+![Combined Binary Image](../output_images/2_combined_binary.jpg)
 
 
 
@@ -112,11 +112,11 @@ Transformaciju sam primenila na binarnu sliku iz prethodnog koraka (`binary_img`
 Ista funkcija se kasnije koristi i za vracanje u originalnu perspektivu, samo sa zamenjenim redosledom tacaka (`dst`, `src`).
 Ulazna binarna slika:
 
-![Binary Image](./output_images/2_combined_binary.jpg)
+![Binary Image](../output_images/2_combined_binary.jpg)
 
 Primer binarne slike nakon perspektivne transformacije:
 
-![Perspective Transform Image](./output_images/3_perspective_transform.jpg)
+![Perspective Transform Image](../output_images/3_perspective_transform.jpg)
 
 
 
@@ -134,7 +134,7 @@ Kroz pronadjene piksele leve i desne trake sam pomocu `np.polyfit` provukla poli
 
 Na slici su zelenom bojom prikazani klizni prozori, crvenom pikseli leve trake, plavom pikseli desne trake, a zutom dobijeni polinomi:
 
-![Lane Detection and Fitted Polynomials](./output_images/4_lane_detection.png)
+![Lane Detection and Fitted Polynomials](../output_images/4_lane_detection.png)
 
 
 
@@ -174,7 +174,7 @@ Na kraju sam pomocu `cv2.putText` u gornjem levom uglu ispisala radijus zakrivlj
 
 Konacan rezultat za test sliku:
 
-![Result Image](./output_images/5_result.jpg)
+![Result Image](../output_images/5_result.jpg)
 
 
 
@@ -190,7 +190,7 @@ Video `test_videos/project_video01.mp4` sam ucitala pomocu `cv2.VideoCapture` i 
 
 Pipeline radi dobro na celom videu (svih 221 frejmova): traka je prepoznata u svakom frejmu i zelena povrsina prati traku bez vecih odstupanja.
 
-Video je na lokaciji: [Output Video](./output_video.avi)
+Video je na lokaciji: [Output Video](../output_video.avi)
 
 
 ### Discussion

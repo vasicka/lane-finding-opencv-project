@@ -53,7 +53,7 @@ Then, for each image in `camera_cal/`:
 Once the points from all images have been collected, `cv2.calibrateCamera(matrix_points, image_points, ...)` is called, which returns the camera matrix (`camera_matrix`) and the distortion coefficients (`dist_coeffs`). 
 To verify the calibration, `cv2.undistort` with the obtained parameters was applied to the image `camera_cal/calibration1.jpg`. On the left is the original image, and on the right is the image with the distortion removed. In the original image the board lines are curved toward the edges, while in the corrected image they are straight:
 
-![Calibration Original and Undistorted](./output_images/0_undistort_chessboard.jpg)
+![Calibration Original and Undistorted](../output_images/0_undistort_chessboard.jpg)
 
 
 ### Pipeline (single images)
@@ -67,11 +67,11 @@ After obtaining the camera matrix (`camera_matrix`) and the distortion coefficie
 The difference between the original and the corrected road image is not as noticeable as with the chessboard, but it is most visible at the edges of the image, where the distortion is greatest.
 Original road image:
 
-![Original Road Image](./test_images/whiteCarLaneSwitch.jpg)
+![Original Road Image](../test_images/whiteCarLaneSwitch.jpg)
 
 Example of the road image after distortion removal:
 
-![Undistorted Road Image](./output_images/1_undistorted.jpg)
+![Undistorted Road Image](../output_images/1_undistorted.jpg)
 
 
 
@@ -95,7 +95,7 @@ Finally, I merged both results: a pixel in the `combined_binary` image has the v
 
 Example binary image (the yellow line on the left was obtained from the B channel, and the white dashed lines on the right using the Canny algorithm):
 
-![Combined Binary Image](./output_images/2_combined_binary.jpg)
+![Combined Binary Image](../output_images/2_combined_binary.jpg)
 
 
 
@@ -112,11 +112,11 @@ I applied the transform to the binary image from the previous step (`binary_img`
 The same function is later also used to return to the original perspective, just with the order of the points swapped (`dst`, `src`).
 Input binary image:
 
-![Binary Image](./output_images/2_combined_binary.jpg)
+![Binary Image](../output_images/2_combined_binary.jpg)
 
 Example of the binary image after the perspective transform:
 
-![Perspective Transform Image](./output_images/3_perspective_transform.jpg)
+![Perspective Transform Image](../output_images/3_perspective_transform.jpg)
 
 
 
@@ -134,7 +134,7 @@ Using `np.polyfit`, I fit a second-order polynomial of the form x = A * y^2 + B 
 
 In the image, the sliding windows are shown in green, the left lane pixels in red, the right lane pixels in blue, and the fitted polynomials in yellow:
 
-![Lane Detection and Fitted Polynomials](./output_images/4_lane_detection.png)
+![Lane Detection and Fitted Polynomials](../output_images/4_lane_detection.png)
 
 
 
@@ -174,7 +174,7 @@ Finally, using `cv2.putText`, I wrote the radius of curvature and the vehicle's 
 
 Final result for the test image:
 
-![Result Image](./output_images/5_result.jpg)
+![Result Image](../output_images/5_result.jpg)
 
 
 
@@ -190,7 +190,7 @@ I loaded the video `test_videos/project_video01.mp4` using `cv2.VideoCapture` an
 
 The pipeline works well on the entire video (all 221 frames): the lane is recognized in every frame and the green area follows the lane without major deviations.
 
-The video is located at: [Output Video](./output_video.avi)
+The video is located at: [Output Video](../output_video.avi)
 
 
 ### Discussion
